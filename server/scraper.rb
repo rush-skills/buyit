@@ -72,8 +72,8 @@ get '/*' do
     :discount => discount.to_i, :price => price, :high => high, :low => low, :average => average, value: value}
 
   result = algo(data_points)
-  # puts result
-  # return data_points.to_json
+
+  puts result
   return result.to_s
 end
 
@@ -190,7 +190,6 @@ def compute_qa(data)
     0
   end
   ratio = data[:answers]/data[:questions].to_f
-  puts "Ratio = " + ratio.to_s
   if ratio < 0.25 or ratio.nan?
     r7 = 0
   elsif ratio > 0.25 and ratio < 0.5
