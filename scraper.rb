@@ -63,19 +63,75 @@ get '/*' do
   end
 
   average = total/count
+  price = price.gsub(',','').to_i
+  value = (price - average)/average.to_f
 
-  value = (price.gsub(',','').to_i - average)/average.to_f
-
-  data_points =  {:sentiment => sentiment, :rating => rating,:rating_count => rating_count,:reviews_count => reviews_count,
-    :seller_review => seller_review, :other_sellers => other_sellers, :title => title, :photo_count => photo_count,
-    :content_length => content_length, :more_styles => more_styles, :questions => questions, :answers => answers,
-    :discount => discount, :price => price, :high => high, :low => low, :average => average, value: value}
+  data_points =  {:sentiment => sentiment, :rating => rating.to_f,:rating_count => rating_count.to_i,:reviews_count => reviews_count.to_i,
+    :seller_review => seller_review.to_f, :other_sellers => other_sellers.to_i, :title => title, :photo_count => photo_count,
+    :content_length => content_length, :more_styles => more_styles, :questions => questions.to_i, :answers => answers.to_i,
+    :discount => discount.to_i, :price => price, :high => high, :low => low, :average => average, value: value}
 
   result = algo(data_points)
-  return result
-  end
-
-  def algo(data)
-
-  end
+  puts result
+  return data_points.to_json
 end
+
+r1, r2, r3, r4, r5, r6, r7, r8, r9, r10 = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+def algo(data)
+  r1 = compute_rating(data)
+  r2 = compute_seller(data)
+  r3 = compute_other_sellers(data)
+  r4 = compute_photo data
+  r5 = compute_content data
+  r6 = compute_more_styles data
+  r7 = compute_qa data
+  r8 = compute_discount data
+  r9 = compute_price_diff data
+  r10 = compute_sentiment data
+
+
+end
+
+def compute_rating(data)
+  unless data[:rating]
+    0
+  end
+  if data[:rating_count] > 50 and data[:reviews_count] > 10
+    if data[:rating] < 2
+      r1 = 0
+    elsif data[:rating] < 3.5 and data[:rating] > 2
+      r1 = 1
+    else
+      r1 = 2
+    end
+  elsif data[:rating_count] > 10 and data[:reviews_count] > 1
+    if data[:rating] < 3
+      r1 = 0
+    elsif data[:rating] < 4 and data[:rating] > 3
+      r1 = 1
+    else
+      r1 = 2
+    end
+  else
+    r1 = 0
+  end
+
+  r1
+end
+
+def compute_seller(data)
+  unless data[:seller_review]
+    0
+  end
+  if data[:seller_review] < 3.5
+    r2 = 0
+  elsif data[:seller_review] > 3.5 and data[:seller_review] < 4.5
+    r2 = 1
+  else
+    r2 = 2
+  end
+  r2
+end
+
+
