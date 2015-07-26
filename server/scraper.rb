@@ -5,7 +5,7 @@ require 'json'
 require 'selenium-webdriver'
 require 'nokogiri'
 require 'open-uri'
-
+require 'digest/sha1'
 
 get '/' do
   return "hello"
@@ -14,6 +14,16 @@ end
 get '/*' do
   # Fetch and parse HTML document
   url = params["splat"][0].to_s
+  hash = Digest::SHA1.hexdigest(url)
+  cache_file = File.join("cache",hash.to_s)
+  if !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - 3600*24*5))
+    data = compute(url)
+    File.open(cache_file,"w"){ |f| f << data }
+  end
+  send_file cache_file, :type => 'application/json'
+end
+
+def compute(url)
   doc = Nokogiri::HTML(open("http://" + url))
 
   rating = doc.css('.sd-product-main-rating')[0]["md-data-rating"] if doc.css('.sd-product-main-rating')[0]
