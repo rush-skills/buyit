@@ -38,10 +38,17 @@ chrome.tabs.onActivated.addListener(function(tabId, changeInfo, updatedTab) {
 function reset_data() {
   chrome.tabs.getSelected(null,function(tab){
     url=tab.url.replace(/https?:\/\//i, "").split('#')[0];
-    fetch_url = 'http://localhost:3456/' + url;
-    console.log("in reset_Data of background: "+ fetch_url);
-    fetch_data(fetch_url);
-
+    if(url.indexOf("snapdeal") > -1){
+      fetch_url = 'http://localhost:3456/' + url;
+      console.log("in reset_Data of background: "+ fetch_url);
+      fetch_data(fetch_url);
+    }
+    else{
+      chrome.browserAction.setIcon(
+      {
+        path: "icon.png"
+      });
+    }
   });
 }
 
