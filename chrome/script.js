@@ -1,13 +1,3 @@
-// Copyright (c) 2014 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-/**
- * Get the current URL.
- *
- * @param {function(string)} callback - called when the URL of the current tab
- *   is found.
- */
 function getCurrentTabUrl(callback) {
   // Query filter to be passed to chrome.tabs.query - see
   // https://developer.chrome.com/extensions/tabs#method-query
@@ -55,7 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
   reset_data();
 });
 
-chrome.tabs.onUpdated.addListener(reset_data);
+chrome.tabs.onUpdated.addListener(function(activeInfo) {
+  reset_data()
+});
+chrome.tabs.onActivated.addListener(function(tabId, changeInfo, updatedTab) {
+  reset_data()
+});
 
 function reset_data() {
   getCurrentTabUrl(function(url) {
